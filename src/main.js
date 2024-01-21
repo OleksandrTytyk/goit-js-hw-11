@@ -1,4 +1,3 @@
-// Описаний у документації
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
@@ -7,14 +6,15 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '41901135-804299004675a38bc43612a92';
 
-
 const refs = {
   form: document.querySelector('.js-form'),
   input: document.querySelector('.js-form-input'),
   btn: document.querySelector('.js-form-btn'),
   card: document.querySelector('.js-card-container'),
-  loader: document.querySelector('.js-loader'),
+  loader: document.querySelector('.loader'),
 };
+
+refs.loader.style.display = 'none';
 
 const gallery = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
@@ -23,33 +23,19 @@ const gallery = new SimpleLightbox('.gallery a', {
 
 clearGallery();
 
-
-
 refs.form.addEventListener('submit', handleImageSearchSubmit);
 
-function handleImageSearchSubmit(event) {
-  event.preventDefault();
-
-  const searchQuery = refs.input.value.trim();
-
-  // refs.loader.classList.add('loader')
-
-  if (searchQuery === '') {
-    iziToast.warning({
-      message: 'Please enter a search query', // Сообщение на английском
-      position: 'topRight',
-    });
-    return;
-  }
-
-
-  
+function fetchData(searchQuery) {
   const url = `${BASE_URL}?key=${API_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true`;
 
-  fetch(url)
-    .then(response => response.json())
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+      throw new Error(response.status)
+      }
+    return response.json()
+    })
     .then(data => {
-
       if (!data.hits.length) {
         iziToast.error({
           message:
@@ -57,48 +43,35 @@ function handleImageSearchSubmit(event) {
           position: 'topRight',
         });
       }
-
-
-      refs.card.innerHTML = ('beforeend', createMarkup(data.hits));
-      gallery.refresh();
-      // return data.hits;
-    })
-    .finally(() => refs.form.reset());
-  
-  refs.loader.classList.remove('loader')
-
+      return data.hits;
+    });
 }
 
-// function fetchImages(url) {
-//   fetch(url)
-//     .then(response => {
-//       if (!response.ok) {
-//         throw new Error(`Network response was not ok: ${response.status}`);
-//       }
-//       return response.json();
-//     })
-//     .then(data => {
-//       if (data.hits.length !== 0) {
-//         refs.card.innerHTML = createMarkup(data.hits);
-//         gallery.destroy();
-//         gallery = new SimpleLightbox('.gallery a', {});
-//       } else {
-//         iziToast.error({
-//           message:
-//             'Sorry, there are no images matching your search query. Please try again!',
-//           position: 'topRight',
-//         });
-//       }
-//     })
-//     .catch(error => {
-//       console.error('Fetch error:', error);
-//       iziToast.error({
-//         message: 'An error occurred while fetching data. Please try again.',
-//         position: 'topRight',
-//       });
-//     })
-//     .finally(() => refs.form.reset());
-// }
+function handleImageSearchSubmit(event) {
+  event.preventDefault();
+
+  refs.loader.style.display = 'block';
+
+  const searchQuery = refs.input.value.trim();
+
+  if (searchQuery === '') {
+    iziToast.warning({
+      message: 'Please enter a search query', 
+    });
+
+    return;
+  }
+
+  fetchData(searchQuery)
+    .then(imgGallery => {
+      refs.card.innerHTML = ('beforeend', createMarkup(imgGallery));
+      gallery.refresh();
+    })
+    .catch(error=>console.log(error)).finally(() => {
+      refs.loader.style.display = 'none';
+      refs.form.reset();
+    });
+}
 
 function createMarkup(imgCard) {
   return imgCard
@@ -121,14 +94,16 @@ function createMarkup(imgCard) {
           src="${webformatURL}"
           alt="${tags}"
           class="small-img js-small-img"
+          width="360px"
+          height="240px"
         />
       </a>
     </div>
     <div class="stats-container js-stats-container">
-      <p class="stats">Likes: ${likes}</p>
-      <p class="stats">Views: ${views}</p>
-      <p class="stats">Comments: ${comments}</p>
-      <p class="stats">Downloads: ${downloads}</p>
+      <p class="stats"><b>Likes:</b> ${likes}</p>
+      <p class="stats"><b>Views:</b> ${views}</p>
+      <p class="stats"><b>Comments:</b> ${comments}</p>
+      <p class="stats"><b>Downloads:</b> ${downloads}</p>
     </div>
   </li>
 `;
@@ -139,3 +114,5 @@ function createMarkup(imgCard) {
 function clearGallery() {
   refs.card.innerHTML = '';
 }
+
+
