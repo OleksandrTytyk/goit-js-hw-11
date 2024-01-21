@@ -31,9 +31,9 @@ function fetchData(searchQuery) {
   return fetch(url)
     .then(response => {
       if (!response.ok) {
-      throw new Error(response.status)
+        throw new Error(response.status);
       }
-    return response.json()
+      return response.json();
     })
     .then(data => {
       if (!data.hits.length) {
@@ -56,7 +56,7 @@ function handleImageSearchSubmit(event) {
 
   if (searchQuery === '') {
     iziToast.warning({
-      message: 'Please enter a search query', 
+      message: 'Please enter a search query',
     });
 
     return;
@@ -64,10 +64,11 @@ function handleImageSearchSubmit(event) {
 
   fetchData(searchQuery)
     .then(imgGallery => {
-      refs.card.innerHTML = ('beforeend', createMarkup(imgGallery));
+      refs.card.innerHTML = createMarkup(imgGallery);
       gallery.refresh();
     })
-    .catch(error=>console.log(error)).finally(() => {
+    .catch(error => console.log(error))
+    .finally(() => {
       refs.loader.style.display = 'none';
       refs.form.reset();
     });
@@ -114,5 +115,3 @@ function createMarkup(imgCard) {
 function clearGallery() {
   refs.card.innerHTML = '';
 }
-
-
