@@ -7,7 +7,7 @@ import{S as m,i as c}from"./assets/vendor-5b791d57.js";(function(){const s=docum
           alt="${e}"
           class="small-img js-small-img"
           width="360px"
-          height="240px"
+          height="260px"
         />
       </a>
     </div>
