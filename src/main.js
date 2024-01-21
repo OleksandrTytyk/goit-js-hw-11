@@ -95,7 +95,7 @@ function createMarkup(imgCard) {
           alt="${tags}"
           class="small-img js-small-img"
           width="360px"
-          height="240px"
+          height="260px"
         />
       </a>
     </div>
