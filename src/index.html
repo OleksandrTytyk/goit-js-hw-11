@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
+
     <form class="form js-form">
       <input
         type="text"
@@ -15,9 +16,15 @@
         placeholder="Search form..."
         required
       />
-
       <button type="submit" class="form-btn js-form-btn">Search</button>
     </form>
+
+    <div class="js-loader"></div>
+    <!-- <span class="loader"></span> -->
+
+    <div class="result-markup js-result-markup">
+      <ul class="card-container js-card-container"></ul>
+    </div>
 
     <script type="module" src="./main.js"></script>
   </body>
